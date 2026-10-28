@@ -1,7 +1,7 @@
 import { randomUUID, timingSafeEqual } from 'node:crypto';
 import express, { type NextFunction, type Request, type Response } from 'express';
 import type { AppConfig } from './config.js';
-import { ChatGPTWebAdapter } from './adapters/chatgpt-web.js';
+import { ChromeExtensionBridge } from './adapters/chrome-extension-bridge.js';
 import { buildBrowserPrompt, estimateTokens } from './core/prompt.js';
 import { parseAssistantResponse } from './core/tool-protocol.js';
 import type { ChatCompletionRequest, ToolDefinition } from './core/types.js';
@@ -98,18 +98,57 @@ async function sendSse(res: Response, id: string, model: string, parsed: ReturnT
   res.end();
 }
 
-export function createApp(config: AppConfig, adapter: ChatGPTWebAdapter) {
+export function createApp(config: AppConfig, bridge: ChromeExtensionBridge) {
   const app = express();
   app.disable('x-powered-by');
   app.use(express.json({ limit: '2mb', strict: true }));
 
-  app.get('/health', async (_req, res) => {
+  app.get('/health', (_req, res) => {
     res.json({
       ok: true,
       service: 'webquota-agent',
-      version: '0.1.0',
-      browser: await adapter.status(),
+      version: '0.2.0',
+      bridge: bridge.status(),
     });
+  });
+
+  app.get('/bridge/next', authenticate(config), async (req, res, next) => {
+    try {
+      const parsedWait = Number.parseInt(String(req.query.waitMs ?? '20000'), 10);
+      const waitMs = Number.isFinite(parsedWait) ? Math.max(0, Math.min(parsedWait, 25_000)) : 20_000;
+      const job = await bridge.nextJob(waitMs);
+      res.setHeader('Cache-Control', 'no-store');
+      if (!job) {
+        res.status(204).end();
+        return;
+      }
+      res.json(job);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  app.post('/bridge/result', authenticate(config), (req, res) => {
+    const body = req.body as Record<string, unknown> | undefined;
+    if (!body || typeof body.id !== 'string' || typeof body.success !== 'boolean') {
+      res.status(400).json({ error: { message: 'Expected id (string) and success (boolean).', type: 'invalid_request_error' } });
+      return;
+    }
+    if (body.success && typeof body.text !== 'string') {
+      res.status(400).json({ error: { message: 'A successful result must include text (string).', type: 'invalid_request_error' } });
+      return;
+    }
+    const accepted = bridge.submitResult(
+      body.id,
+      body.success,
+      typeof body.text === 'string' ? body.text.slice(0, 250_000) : '',
+      typeof body.error === 'string' ? body.error.slice(0, 4_000) : '',
+    );
+    if (!accepted) {
+      res.status(404).json({ error: { message: 'Unknown, expired, or already completed bridge job.', type: 'invalid_request_error' } });
+      return;
+    }
+    res.json({ ok: true });
   });
 
   app.get('/v1/models', authenticate(config), (_req, res) => {
@@ -138,7 +177,7 @@ export function createApp(config: AppConfig, adapter: ChatGPTWebAdapter) {
         return;
       }
 
-      const raw = await adapter.complete(prompt);
+      const raw = await bridge.complete(prompt);
       const parsed = parseAssistantResponse(raw, tools);
       const message = parsed.kind === 'tool_calls'
         ? { role: 'assistant', content: null, tool_calls: parsed.toolCalls }
