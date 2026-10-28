@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WebQuota Bridge Panel</title>
+  <link rel="stylesheet" href="panel.css">
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <div class="mark">WQ</div>
+      <div>
+        <h1>WebQuota Bridge</h1>
+        <p>Connect this panel to your local gateway.</p>
+      </div>
+    </header>
+
+    <section class="card">
+      <label for="apiKey">Local API key</label>
+      <input id="apiKey" type="password" autocomplete="off" spellcheck="false" placeholder="Paste WEBQUOTA_API_KEY from .env">
+      <p class="hint">Stored in this extension's local storage. Never paste this key into ChatGPT.</p>
+      <div class="actions">
+        <button id="connect" class="primary">Connect</button>
+        <button id="disconnect" class="secondary" disabled>Disconnect</button>
+      </div>
+      <div id="status" class="status" role="status">Not connected</div>
+    </section>
+
+    <section class="card">
+      <h2>Before using</h2>
+      <ol>
+        <li>Open a separate tab at <code>https://chatgpt.com</code>.</li>
+        <li>Sign in manually in your normal Chrome profile.</li>
+        <li>Keep this Bridge Panel open while the local agent is running.</li>
+      </ol>
+      <p class="hint">This extension does not solve security challenges. If sign-in or verification appears, handle it in Chrome yourself.</p>
+    </section>
+    <footer>Local only · 127.0.0.1:4153</footer>
+  </main>
+  <script src="panel.js"></script>
+</body>
+</html>
