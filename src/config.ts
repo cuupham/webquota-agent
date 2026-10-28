@@ -1,11 +1,7 @@
-import path from 'node:path';
-
 export interface AppConfig {
   apiKey: string;
   host: string;
   port: number;
-  browserProfile: string;
-  headless: boolean;
   responseTimeoutMs: number;
   maxPromptChars: number;
 }
@@ -35,8 +31,6 @@ export function readConfig(): AppConfig {
     apiKey,
     host,
     port: positiveInt('WEBQUOTA_PORT', 4153),
-    browserProfile: path.resolve(process.env.WEBQUOTA_BROWSER_PROFILE?.trim() || './browser-profile'),
-    headless: process.env.WEBQUOTA_HEADLESS?.toLowerCase() === 'true',
     responseTimeoutMs: positiveInt('WEBQUOTA_RESPONSE_TIMEOUT_MS', 180_000),
     maxPromptChars: positiveInt('WEBQUOTA_MAX_PROMPT_CHARS', 80_000),
   };
