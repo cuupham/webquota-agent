@@ -29,9 +29,11 @@ try {
   }
 
   npm install
-  npx playwright install chromium
   npm run check
-  Write-Host 'Setup complete. Start with .\scripts\start.ps1'
+  Write-Host ''
+  Write-Host 'Setup complete.'
+  Write-Host 'Next: start the API with .\scripts\start.ps1'
+  Write-Host 'Then load the extension folder in Chrome at chrome://extensions.'
 } finally {
   Pop-Location
 }
