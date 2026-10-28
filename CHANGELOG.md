@@ -1,9 +1,13 @@
 # Changelog
 
-## Unreleased
+## 0.2.0 - Chrome extension bridge
 
-- Add a Windows uninstall script that removes dependencies/build output by default and preserves local credentials and browser profile.
-- Add an explicit option to remove local configuration and the dedicated browser session.
+- Replace the separate Playwright Chromium profile with an extension for the user's normal Chrome profile.
+- Add authenticated local queue/result endpoints for browser jobs.
+- Add a Bridge Panel for pairing with the local API key and polling for work.
+- Add a content script that interacts with a manually signed-in ChatGPT tab.
+- Remove the Playwright runtime dependency and browser installation step.
+- Add extension bridge lifecycle tests and update Windows setup/uninstall docs.
 
 ## 0.1.0 - initial prototype
 
