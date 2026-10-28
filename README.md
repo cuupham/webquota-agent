@@ -69,3 +69,17 @@ Read docs/architecture.md and docs/security.md before connecting a coding agent.
 ## Quick setup helper
 
 Run the commands above once per machine. To update dependencies later, run npm install and npm run check.
+
+## Uninstall
+
+Stop the running server first with Ctrl+C in its terminal. Then run:
+
+    .\scripts\uninstall.ps1
+
+By default this removes \`node_modules\` and generated \`dist\` files, while keeping \`.env\` and \`browser-profile\` so your local key/configuration and browser session are not lost.
+
+To also delete that local data:
+
+    .\scripts\uninstall.ps1 -RemoveLocalData
+
+Review the confirmation prompts carefully. This does not remove Node.js, Git, or the shared Playwright browser cache.
