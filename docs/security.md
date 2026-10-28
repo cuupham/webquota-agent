@@ -1,14 +1,19 @@
 # Security model and operational checklist
 
-This prototype controls a logged-in browser profile. Use only a dedicated, user-controlled environment.
+## Browser session
 
-## Before first run
+- Use your normal Chrome profile only after you sign in manually.
+- The extension operates on \`https://chatgpt.com/*\`; it does not extract cookies, passwords, or authentication tokens.
+- The extension needs its Bridge Panel tab to remain open. Disconnect it when not using the local API.
+- If sign-in expires or a security verification page appears, handle it manually in Chrome. Do not implement CAPTCHA solving, stealth, account rotation, or methods to bypass service controls.
 
-- Review applicable service terms before automating a web interface.
-- Use a dedicated Playwright profile. Do not import or copy cookies from your normal browser.
-- Generate a random WEBQUOTA_API_KEY of at least 32 characters.
-- Keep the service bound to 127.0.0.1.
-- Confirm .env and browser-profile are ignored by Git.
+## Local API
+
+- Keep the gateway bound to \`127.0.0.1\`.
+- Use a random \`WEBQUOTA_API_KEY\` of at least 32 characters.
+- The extension needs host permissions only for \`https://chatgpt.com/*\` and \`http://127.0.0.1:4153/*\`.
+- Never expose the local API through port forwarding, a public tunnel, or a shared LAN.
+- Do not commit \`.env\`, local browser data, or API keys.
 
 ## Local tool boundary
 
@@ -18,8 +23,8 @@ Do not enable unattended arbitrary PowerShell merely because the model returned 
 
 ## Data handling
 
-Prompts, system messages, source snippets, logs, and test output are sent through ChatGPT Web. Do not use this with secrets, production credentials, private customer data, or repositories whose contents must remain local.
+Prompts, source snippets, logs, tool results, and assistant responses flow through ChatGPT Web. Do not use this with secrets, production credentials, private customer data, or repositories whose contents must remain local. Automated interaction and extraction from the ChatGPT web interface may be subject to applicable service terms; review them before using this prototype.
 
 ## Stop conditions
 
-Stop on login expiry, security verification, a usage-limit notice, unexpected redirects, repeated malformed outputs, or selector drift. Do not implement CAPTCHA solving, account rotation, stealth behavior, or methods to bypass service controls.
+Stop on login expiry, security verification, a usage-limit notice, unexpected redirects, repeated malformed outputs, or selector drift.
