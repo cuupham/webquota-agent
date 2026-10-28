@@ -1,6 +1,6 @@
 [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
 param(
-  # Also remove the API key/config and the dedicated Playwright profile (including its login session).
+  # Also remove the API key/config and any legacy Playwright profile from older versions.
   [switch]$RemoveLocalData
 )
 
@@ -26,11 +26,11 @@ try {
   if ($RemoveLocalData) {
     $targets += @(
       @{ Path = (Join-Path $projectRoot '.env'); Label = 'Local API key and configuration' },
-      @{ Path = (Join-Path $projectRoot 'browser-profile'); Label = 'Dedicated browser profile and login session' }
+      @{ Path = (Join-Path $projectRoot 'browser-profile'); Label = 'Legacy Playwright browser profile, if present' }
     )
   } else {
-    Write-Host 'Keeping .env and browser-profile. They contain your API key/configuration and browser session.'
-    Write-Host 'Pass -RemoveLocalData only if you also want those local data removed.'
+    Write-Host 'Keeping .env and any legacy browser-profile folder.'
+    Write-Host 'Pass -RemoveLocalData only if you also want local configuration and legacy browser data removed.'
   }
 
   foreach ($target in $targets) {
@@ -46,8 +46,8 @@ try {
 
   Write-Host ''
   Write-Host 'WebQuota Agent local dependencies/build output have been removed.'
-  Write-Host 'This script does not uninstall Node.js, Git, PowerShell, or the shared Playwright browser cache.'
-  Write-Host 'The source repository remains intact.'
+  Write-Host 'To remove the Chrome extension and its saved API key, open chrome://extensions and remove WebQuota Agent Bridge.'
+  Write-Host 'This script does not uninstall Node.js, Git, or Chrome.'
 } finally {
   Pop-Location
 }
