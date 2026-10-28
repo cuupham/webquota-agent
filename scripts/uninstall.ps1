@@ -14,8 +14,8 @@ try {
     $listeners = @(Get-NetTCPConnection -LocalPort 4153 -State Listen -ErrorAction SilentlyContinue)
   }
   if ($listeners.Count -gt 0) {
-    $pids = ($listeners | Select-Object -ExpandProperty OwningProcess -Unique) -join ', '
-    throw "Port 4153 still has a listening process (PID: $pids). Stop WebQuota Agent with Ctrl+C in its running terminal, then rerun uninstall."
+    $processIds = ($listeners | Select-Object -ExpandProperty OwningProcess -Unique) -join ', '
+    throw "Port 4153 still has a listening process (PID: $processIds). Stop WebQuota Agent with Ctrl+C in its running terminal, then rerun uninstall."
   }
 
   $targets = @(
