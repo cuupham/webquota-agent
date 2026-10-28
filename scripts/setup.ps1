@@ -13,7 +13,12 @@ try {
   if (-not (Test-Path '.env')) {
     Copy-Item '.env.example' '.env'
     $bytes = New-Object byte[] 48
-    [System.Security.Cryptography.RandomNumberGenerator]::Fill($bytes)
+    $rng = [System.Security.Cryptography.RandomNumberGenerator]::Create()
+    try {
+      $rng.GetBytes($bytes)
+    } finally {
+      $rng.Dispose()
+    }
     $key = [Convert]::ToBase64String($bytes).TrimEnd('=').Replace('+','-').Replace('/','_')
     $envText = Get-Content '.env' -Raw
     $envText = $envText -replace '(?m)^WEBQUOTA_API_KEY=.*$', "WEBQUOTA_API_KEY=$key"
