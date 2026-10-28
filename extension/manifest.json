@@ -1,0 +1,27 @@
+{
+  "manifest_version": 3,
+  "name": "WebQuota Agent Bridge",
+  "version": "0.2.0",
+  "description": "Connects the local WebQuota Agent API to a ChatGPT tab you open in Chrome.",
+  "permissions": [
+    "storage",
+    "tabs"
+  ],
+  "host_permissions": [
+    "https://chatgpt.com/*",
+    "http://127.0.0.1:4153/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://chatgpt.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_title": "Open WebQuota Bridge Panel"
+  }
+}
